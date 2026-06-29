@@ -2,8 +2,14 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>關西輕旅行｜動態抽顏色拍照遊戲 v2</title>
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="色彩特攻">
+    <link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1MTIiIGhlaWdodD0iNTEyIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjNEExNDhDIi8+PGNpcmNsZSBjeD0iMjU2IiBjeT0iMjU2IiByPSIxNTAiIGZpbGw9IiNFMEFBRkYiLz48L3N2Zz4=">
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Noto+Sans+TC:wght@300;400;700&display=swap" rel="stylesheet">
@@ -26,7 +32,6 @@
             --sub-btn-border: rgba(0, 0, 0, 0.06);
             --shadow-color: rgba(31, 38, 135, 0.08);
             
-            /* 淺色背景動態流動色暈 */
             --glow-1: #e8dbfc;
             --glow-2: #fcd3de;
             --glow-3: #cdeefa;
@@ -45,289 +50,123 @@
             --sub-btn-border: rgba(255, 255, 255, 0.1);
             --shadow-color: rgba(0, 0, 0, 0.4);
             
-            /* 深色背景動態流動色暈 */
             --glow-1: #321250;
             --glow-2: #4a1225;
             --glow-3: #123550;
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
         body, html {
-            width: 100%;
-            height: 100%;
+            width: 100%; height: 100%;
             overflow: hidden;
             font-family: var(--font-zh);
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            display: flex; justify-content: center; align-items: center;
             background-color: var(--bg-base);
             transition: background-color 0.5s ease;
+            -webkit-user-select: none; user-select: none; /* 防止點按選取字體 */
         }
 
-        /* --- 潮流科技感：流動色暈背景 (Mesh Gradient) --- */
-        .mesh-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            z-index: -1;
-            overflow: hidden;
-        }
-
-        .mesh-glow {
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(90px);
-            opacity: 0.7;
-            animation: floatAround 15s ease-in-out infinite alternate;
-            transition: background 0.5s ease;
-        }
-
-        .glow-1 {
-            width: 500px;
-            height: 500px;
-            background: radial-gradient(circle, var(--glow-1) 0%, transparent 70%);
-            top: -10%;
-            left: -5%;
-            animation-duration: 12s;
-        }
-
-        .glow-2 {
-            width: 550px;
-            height: 550px;
-            background: radial-gradient(circle, var(--glow-2) 0%, transparent 70%);
-            bottom: -10%;
-            right: -5%;
-            animation-duration: 16s;
-        }
-
-        .glow-3 {
-            width: 450px;
-            height: 450px;
-            background: radial-gradient(circle, var(--glow-3) 0%, transparent 70%);
-            top: 50%;
-            left: -15%;
-            animation-duration: 14s;
-        }
-
+        /* --- 背景與卡片 UI --- */
+        .mesh-container { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; overflow: hidden; }
+        .mesh-glow { position: absolute; border-radius: 50%; filter: blur(90px); opacity: 0.7; animation: floatAround 15s ease-in-out infinite alternate; transition: background 0.5s ease; }
+        .glow-1 { width: 500px; height: 500px; background: radial-gradient(circle, var(--glow-1) 0%, transparent 70%); top: -10%; left: -5%; animation-duration: 12s; }
+        .glow-2 { width: 550px; height: 550px; background: radial-gradient(circle, var(--glow-2) 0%, transparent 70%); bottom: -10%; right: -5%; animation-duration: 16s; }
+        .glow-3 { width: 450px; height: 450px; background: radial-gradient(circle, var(--glow-3) 0%, transparent 70%); top: 50%; left: -15%; animation-duration: 14s; }
+        
         @keyframes floatAround {
             0% { transform: translate(0, 0) scale(1); }
             50% { transform: translate(50px, 70px) scale(1.1); }
             100% { transform: translate(-40px, 40px) scale(0.95); }
         }
 
-        /* --- 液態玻璃風格：風格切換鈕 (Theme Toggle) --- */
-        .theme-toggle {
+        .theme-toggle { position: fixed; top: 24px; right: 24px; z-index: 100; background: var(--btn-bg); border: 1px solid var(--btn-border); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); width: 48px; height: 48px; border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 10px 30px var(--shadow-color), inset 0 1px 1px rgba(255, 255, 255, 0.2); transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); font-size: 1.25rem; }
+        .theme-toggle:hover { transform: scale(1.1) rotate(15deg); background: rgba(255, 255, 255, 0.7); }
+        [data-theme="dark"] .theme-toggle:hover { background: rgba(255, 255, 255, 0.15); }
+
+        .glass-card { background: var(--card-bg); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); border: 1px solid var(--card-border); box-shadow: 0 30px 60px var(--shadow-color), inset 0 1px 2px rgba(255, 255, 255, 0.3); border-radius: 36px; padding: 4rem 2.2rem 3.5rem 2.2rem; width: 90%; max-width: 430px; text-align: center; color: var(--text-main); position: relative; z-index: 10; transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
+        .hidden { display: none !important; }
+        .app-title { font-family: var(--font-en); font-weight: 800; letter-spacing: 2px; font-size: 0.85rem; color: var(--text-sub); margin-bottom: 2.8rem; text-transform: uppercase; opacity: 0.8; }
+
+        .glass-btn { background: var(--btn-bg); border: 1px solid var(--btn-border); color: var(--text-main); padding: 1.3rem 1.5rem; border-radius: 22px; font-size: 1rem; font-weight: 700; cursor: pointer; transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); box-shadow: 0 12px 35px var(--shadow-color), inset 0 1px 1px rgba(255, 255, 255, 0.4); width: 100%; line-height: 1.6; letter-spacing: 0.5px; }
+        .glass-btn:active, .glass-btn:hover { background: rgba(255, 255, 255, 0.75); border-color: rgba(255, 255, 255, 0.9); transform: translateY(-4px); box-shadow: 0 20px 40px var(--shadow-color); }
+        [data-theme="dark"] .glass-btn:active, [data-theme="dark"] .glass-btn:hover { background: rgba(255, 255, 255, 0.18); }
+
+        .rolling-box { display: flex; flex-direction: column; align-items: center; gap: 2rem; }
+        .rolling-circle { width: 115px; height: 115px; border-radius: 50%; transition: background-color 0.05s ease, box-shadow 0.05s ease; }
+        .rolling-theme { font-size: 1.2rem; font-weight: 700; color: var(--text-main); }
+        .rolling-hex { font-family: var(--font-en); font-weight: 600; letter-spacing: 1.5px; color: var(--text-sub); opacity: 0.6; }
+
+        .result-box { display: flex; flex-direction: column; align-items: center; animation: popIn 0.65s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+        @keyframes popIn { 0% { opacity: 0; transform: scale(0.85) translateY(20px); } 100% { opacity: 1; transform: scale(1) translateY(0); } }
+        .result-circle { width: 135px; height: 135px; border-radius: 50%; margin-bottom: 1.8rem; transition: box-shadow 0.5s ease; }
+        .result-tag-badge { font-size: 0.85rem; font-weight: 700; color: var(--text-sub); margin-bottom: 0.8rem; letter-spacing: 0.5px; opacity: 0.9; }
+        .result-theme { font-size: 1.35rem; font-weight: 700; margin-bottom: 1rem; color: var(--text-main); line-height: 1.4; }
+        .result-task { font-size: 0.95rem; color: var(--text-sub); line-height: 1.6; margin-bottom: 2rem; padding: 0 0.4rem; }
+        .result-hex-badge { font-family: var(--font-en); font-weight: 700; font-size: 0.85rem; padding: 0.45rem 1.4rem; border-radius: 30px; letter-spacing: 1px; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.06); }
+        .glass-btn-sub { background: var(--sub-btn-bg); border: 1px solid var(--sub-btn-border); color: var(--text-sub); padding: 0.55rem 1.4rem; border-radius: 14px; font-size: 0.8rem; font-family: var(--font-en); font-weight: 600; cursor: pointer; transition: all 0.25s ease; margin-top: 2.4rem; letter-spacing: 0.5px; }
+
+        /* --- PWA 專屬引導 UI (Liquid Glass) --- */
+        .pwa-prompt-container {
             position: fixed;
-            top: 24px;
-            right: 24px;
-            z-index: 100;
-            background: var(--btn-bg);
-            border: 1px solid var(--btn-border);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            box-shadow: 0 10px 30px var(--shadow-color), inset 0 1px 1px rgba(255, 255, 255, 0.2);
-            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-            font-size: 1.25rem;
-        }
-
-        .theme-toggle:hover {
-            transform: scale(1.1) rotate(15deg);
-            background: rgba(255, 255, 255, 0.7);
-        }
-        [data-theme="dark"] .theme-toggle:hover {
-            background: rgba(255, 255, 255, 0.15);
-        }
-
-        /* --- 核心主要卡片 (Glassmorphic Card) --- */
-        .glass-card {
+            bottom: -100px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 400px;
+            z-index: 1000;
             background: var(--card-bg);
             backdrop-filter: blur(25px);
             -webkit-backdrop-filter: blur(25px);
             border: 1px solid var(--card-border);
-            box-shadow: 0 30px 60px var(--shadow-color), 
-                        inset 0 1px 2px rgba(255, 255, 255, 0.3);
-            border-radius: 36px;
-            padding: 4rem 2.2rem 3.5rem 2.2rem;
-            width: 90%;
-            max-width: 430px;
+            box-shadow: 0 -10px 40px var(--shadow-color), inset 0 1px 2px rgba(255, 255, 255, 0.4);
+            border-radius: 20px;
+            padding: 1.2rem;
             text-align: center;
+            transition: bottom 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
             color: var(--text-main);
-            position: relative;
-            z-index: 10;
-            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
         }
 
-        .hidden {
-            display: none !important;
-        }
+        .pwa-prompt-container.show { bottom: 30px; }
 
-        .app-title {
-            font-family: var(--font-en);
-            font-weight: 800;
-            letter-spacing: 2px;
-            font-size: 0.85rem;
-            color: var(--text-sub);
-            margin-bottom: 2.8rem;
-            text-transform: uppercase;
-            opacity: 0.8;
-        }
-
-        /* --- 互動按鈕設計 --- */
-        .glass-btn {
-            background: var(--btn-bg);
-            border: 1px solid var(--btn-border);
-            color: var(--text-main);
-            padding: 1.3rem 1.5rem;
-            border-radius: 22px;
-            font-size: 1rem;
+        /* Android 按鈕 */
+        .pwa-android-btn {
+            background: rgba(255, 255, 255, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            border-radius: 12px;
+            padding: 0.7rem 1rem;
             font-weight: 700;
+            font-size: 0.9rem;
+            color: #2b2d42;
             cursor: pointer;
-            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-            box-shadow: 0 12px 35px var(--shadow-color),
-                        inset 0 1px 1px rgba(255, 255, 255, 0.4);
             width: 100%;
-            line-height: 1.6;
-            letter-spacing: 0.5px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
         }
+        [data-theme="dark"] .pwa-android-btn { background: rgba(255,255,255,0.1); color: #fff; }
 
-        .glass-btn:hover {
-            background: rgba(255, 255, 255, 0.75);
-            border-color: rgba(255, 255, 255, 0.9);
-            transform: translateY(-4px);
-            box-shadow: 0 20px 40px var(--shadow-color);
+        /* iOS 氣泡下箭頭 */
+        .ios-arrow-down {
+            width: 0; height: 0;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-top: 10px solid var(--card-border);
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
         }
-        [data-theme="dark"] .glass-btn:hover {
-            background: rgba(255, 255, 255, 0.18);
-        }
+        .pwa-title { font-weight: 800; font-size: 0.85rem; letter-spacing: 1px; color: var(--text-main); }
+        .pwa-desc { font-size: 0.8rem; color: var(--text-sub); line-height: 1.4; }
 
-        /* --- 隨機滾動動畫狀態 (Slot Rolling) --- */
-        .rolling-box {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 2rem;
-        }
-
-        .rolling-circle {
-            width: 115px;
-            height: 115px;
-            border-radius: 50%;
-            transition: background-color 0.05s ease, box-shadow 0.05s ease;
-        }
-
-        .rolling-theme {
-            font-size: 1.2rem;
-            font-weight: 700;
-            color: var(--text-main);
-        }
-
-        .rolling-hex {
-            font-family: var(--font-en);
-            font-weight: 600;
-            letter-spacing: 1.5px;
-            color: var(--text-sub);
-            opacity: 0.6;
-        }
-
-        /* --- 最終彈出結果卡片 (Result State) --- */
-        .result-box {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            animation: popIn 0.65s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-        }
-
-        @keyframes popIn {
-            0% { opacity: 0; transform: scale(0.85) translateY(20px); }
-            100% { opacity: 1; transform: scale(1) translateY(0); }
-        }
-
-        .result-circle {
-            width: 135px;
-            height: 135px;
-            border-radius: 50%;
-            margin-bottom: 1.8rem;
-            transition: box-shadow 0.5s ease;
-        }
-
-        .result-tag-badge {
-            font-size: 0.85rem;
-            font-weight: 700;
-            color: var(--text-sub);
-            margin-bottom: 0.8rem;
-            letter-spacing: 0.5px;
-            opacity: 0.9;
-        }
-
-        .result-theme {
-            font-size: 1.35rem;
-            font-weight: 700;
-            margin-bottom: 1rem;
-            color: var(--text-main);
-            line-height: 1.4;
-        }
-
-        .result-task {
-            font-size: 0.95rem;
-            color: var(--text-sub);
-            line-height: 1.6;
-            margin-bottom: 2rem;
-            padding: 0 0.4rem;
-        }
-
-        .result-hex-badge {
-            font-family: var(--font-en);
-            font-weight: 700;
-            font-size: 0.85rem;
-            padding: 0.45rem 1.4rem;
-            border-radius: 30px;
-            letter-spacing: 1px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.06);
-        }
-
-        /* 重新抽選小按鈕 */
-        .glass-btn-sub {
-            background: var(--sub-btn-bg);
-            border: 1px solid var(--sub-btn-border);
-            color: var(--text-sub);
-            padding: 0.55rem 1.4rem;
-            border-radius: 14px;
-            font-size: 0.8rem;
-            font-family: var(--font-en);
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.25s ease;
-            margin-top: 2.4rem;
-            letter-spacing: 0.5px;
-        }
-
-        .glass-btn-sub:hover {
-            background: rgba(0, 0, 0, 0.08);
-            color: var(--text-main);
-        }
-        [data-theme="dark"] .glass-btn-sub:hover {
-            background: rgba(255, 255, 255, 0.1);
-        }
     </style>
 </head>
 <body>
 
     <button class="theme-toggle" id="theme-toggle-btn" aria-label="Toggle Dark Mode">☀️</button>
-
     <div class="mesh-container">
         <div class="mesh-glow glow-1"></div>
         <div class="mesh-glow glow-2"></div>
@@ -336,22 +175,19 @@
 
     <div class="glass-card">
         <div class="app-title">Kansai Color Matrix</div>
-        
         <div id="initial-state">
             <button id="scan-btn" class="glass-btn">
-                [ INITIATE COLOR SCAN ]<br>點擊抽選今日幸運色
+                [ INITIATE SCAN ]<br>點擊抽選今日幸運色
             </button>
         </div>
-
         <div id="rolling-state" class="hidden rolling-box">
             <div class="rolling-circle" id="rolling-circle"></div>
-            <div class="rolling-theme" id="rolling-theme">核心矩陣分析中...</div>
+            <div class="rolling-theme" id="rolling-theme">矩陣分析中...</div>
             <div class="rolling-hex" id="rolling-hex">#??????</div>
         </div>
-
         <div id="result-state" class="hidden result-box">
             <div class="result-circle" id="result-circle"></div>
-            <div class="result-tag-badge" id="result-tag">生成色調標籤中</div>
+            <div class="result-tag-badge" id="result-tag">生成中</div>
             <h2 class="result-theme" id="result-theme">主題名稱</h2>
             <p class="result-task" id="result-task">任務內容</p>
             <div class="result-hex-badge" id="result-hex">#HEXCODE</div>
@@ -359,232 +195,249 @@
         </div>
     </div>
 
+    <div id="android-pwa-prompt" class="pwa-prompt-container">
+        <div class="pwa-title">[ PWA DETECTED ]</div>
+        <div class="pwa-desc">偵測到特攻裝置，立即部署 100% 離線專屬 App！</div>
+        <button id="install-pwa-btn" class="pwa-android-btn">點擊安裝至手機桌面</button>
+    </div>
+
+    <div id="ios-pwa-prompt" class="pwa-prompt-container">
+        <div class="pwa-title">🍏 特攻隊員請注意</div>
+        <div class="pwa-desc">請點擊 Safari 下方「分享」按鈕<br>➔ 選擇『加入主畫面』解鎖 100% 離線 App！</div>
+        <div class="ios-arrow-down"></div>
+    </div>
+
     <script>
-        // --- 深淺模式（Dark/Light Mode）狀態管理 ---
+        // ==========================================
+        // 1. 動態注入 Manifest (免除外部檔案)
+        // ==========================================
+        const manifestData = {
+            name: "關西色彩特攻",
+            short_name: "色彩特攻",
+            start_url: location.href,
+            display: "standalone",
+            background_color: "#f4f6fa",
+            theme_color: "#4A148C",
+            icons: [{
+                src: "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1MTIiIGhlaWdodD0iNTEyIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjNEExNDhDIi8+PGNpcmNsZSBjeD0iMjU2IiBjeT0iMjU2IiByPSIxNTAiIGZpbGw9IiNFMEFBRkYiLz48L3N2Zz4=",
+                sizes: "512x512",
+                type: "image/svg+xml",
+                purpose: "any maskable"
+            }]
+        };
+        const manifestBlob = new Blob([JSON.stringify(manifestData)], { type: 'application/json' });
+        const manifestUrl = URL.createObjectURL(manifestBlob);
+        const manifestLink = document.createElement('link');
+        manifestLink.rel = 'manifest';
+        manifestLink.href = manifestUrl;
+        document.head.appendChild(manifestLink);
+
+        // ==========================================
+        // 2. Service Worker 鋼鐵快取 (Cache-First)
+        // ==========================================
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                const swCode = `
+                    const CACHE_NAME = 'vibe-color-v1';
+                    // 快取當前頁面與字型
+                    const urlsToCache = [
+                        location.href.split('#')[0].split('?')[0],
+                        'https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Noto+Sans+TC:wght@300;400;700&display=swap'
+                    ];
+
+                    self.addEventListener('install', event => {
+                        self.skipWaiting(); // 強制立即接管
+                        event.waitUntil(
+                            caches.open(CACHE_NAME).then(cache => cache.addAll(urlsToCache))
+                        );
+                    });
+
+                    self.addEventListener('activate', event => {
+                        event.waitUntil(
+                            caches.keys().then(cacheNames => Promise.all(
+                                cacheNames.map(name => {
+                                    if (name !== CACHE_NAME) return caches.delete(name);
+                                })
+                            )).then(() => self.clients.claim())
+                        );
+                    });
+
+                    // 100% Cache-First 離線策略
+                    self.addEventListener('fetch', event => {
+                        if (event.request.method !== 'GET') return;
+                        event.respondWith(
+                            caches.match(event.request).then(response => {
+                                if (response) return response; // 0秒回傳快取
+                                return fetch(event.request).then(fetchRes => {
+                                    return caches.open(CACHE_NAME).then(cache => {
+                                        cache.put(event.request, fetchRes.clone());
+                                        return fetchRes;
+                                    });
+                                }).catch(() => {
+                                    // 斷網且沒快取時，若是請求網頁本身，則回傳根快取
+                                    if (event.request.mode === 'navigate') {
+                                        return caches.match(urlsToCache[0]);
+                                    }
+                                });
+                            })
+                        );
+                    });
+                `;
+                const swBlob = new Blob([swCode], { type: 'application/javascript' });
+                const swUrl = URL.createObjectURL(swBlob);
+                navigator.serviceWorker.register(swUrl)
+                    .then(reg => console.log('✅ 鋼鐵快取 SW 註冊成功', reg.scope))
+                    .catch(err => console.log('❌ SW 註冊失敗', err));
+            });
+        }
+
+        // ==========================================
+        // 3. PWA 安裝導引邏輯 (Android & iOS)
+        // ==========================================
+        const androidPrompt = document.getElementById('android-pwa-prompt');
+        const iosPrompt = document.getElementById('ios-pwa-prompt');
+        const installBtn = document.getElementById('install-pwa-btn');
+        let deferredPrompt;
+
+        // 偵測 iOS 環境與 Standalone 模式
+        const isIOS = () => {
+            return /iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase());
+        };
+        const isInStandaloneMode = () => {
+            return ('standalone' in window.navigator) && (window.navigator.standalone);
+        };
+
+        // iOS 觸發邏輯
+        if (isIOS() && !isInStandaloneMode()) {
+            setTimeout(() => iosPrompt.classList.add('show'), 2000);
+            // 點擊卡片本身可關閉提示
+            document.body.addEventListener('click', (e) => {
+                if(!iosPrompt.contains(e.target)) iosPrompt.classList.remove('show');
+            }, { once: true });
+        }
+
+        // Android 攔截與觸發邏輯
+        window.addEventListener('beforeinstallprompt', (e) => {
+            // 防止系統突兀彈窗
+            e.preventDefault();
+            deferredPrompt = e;
+            // 延遲 1 秒後顯示 Liquid Glass Toast
+            setTimeout(() => androidPrompt.classList.add('show'), 1000);
+        });
+
+        installBtn.addEventListener('click', async () => {
+            if (!deferredPrompt) return;
+            // 呼叫系統原生安裝視窗
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            console.log(`安裝結果: ${outcome}`);
+            deferredPrompt = null;
+            androidPrompt.classList.remove('show');
+        });
+
+
+        // ==========================================
+        // 4. 216 色抽選引擎與 UI 邏輯 (原版繼承)
+        // ==========================================
         const themeToggleBtn = document.getElementById('theme-toggle-btn');
-        
-        // 檢查使用者瀏覽器或上一次儲存的偏好設定
         const savedTheme = localStorage.getItem('app-theme') || 'light';
         document.documentElement.setAttribute('data-theme', savedTheme);
         themeToggleBtn.textContent = savedTheme === 'dark' ? '🌙' : '☀️';
-
         themeToggleBtn.addEventListener('click', () => {
-            const currentTheme = document.documentElement.getAttribute('data-theme');
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            
+            const newTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
             document.documentElement.setAttribute('data-theme', newTheme);
             localStorage.setItem('app-theme', newTheme);
             themeToggleBtn.textContent = newTheme === 'dark' ? '🌙' : '☀️';
         });
 
-        // --- 216色極致漸層矩陣資料庫 (12主題 x 18漸層色碼) ---
         const rawThemes = [
-            {
-                theme: "🌸 【幾何櫻花 ✕ 微醺粉色系】",
-                shortName: "幾何櫻花",
-                task: "尋找街頭任何浪漫的「粉紅色」元素、櫻花意象、或是粉嫩的伴手禮包裝！",
-                colors: ["#FFF0F5", "#FFE4E1", "#FFD1DC", "#FBC4AB", "#F8AD9D", "#F4978E", "#FFB3C1", "#FFA6C9", "#FF8FAB", "#FF758F", "#FF5C8A", "#FF477E", "#FF1493", "#FF007F", "#E60067", "#DE0052", "#C9184A", "#A30026"]
-            },
-            {
-                theme: "🍵 【宇治古剎 ✕ 瑩透抹茶綠】",
-                shortName: "宇治古剎",
-                task: "捕捉一處帶有「綠色」植物的日式屋簷、庭園、青苔或抹茶點心！",
-                colors: ["#F4F9F4", "#E8F5E9", "#C8E6C9", "#D8F3DC", "#B7E4C7", "#A3E4D7", "#95D5B2", "#74C69D", "#52B788", "#40916C", "#2E7D32", "#1B5E20", "#1E4620", "#386641", "#6A994E", "#A7C957", "#38B000", "#007200"]
-            },
-            {
-                theme: "🎐 【鴨川微風 ✕ 縹緲川藍系】",
-                shortName: "縹緲藍",
-                task: "捕捉任何「清澈藍色」的物品，如天空、河川、地鐵車身或晴雨傘！",
-                colors: ["#F0F8FF", "#E0F7FA", "#E0FBFC", "#C2F3F8", "#B3E5FC", "#98E1EC", "#81D4FA", "#4EA8DE", "#3A86C8", "#0077B6", "#023E8A", "#03045E", "#1A237E", "#0D47A1", "#1565C0", "#1976D2", "#0091EA", "#00B0FF"]
-            },
-            {
-                theme: "🏮 【道頓堀河 ✕ 霓虹熱情紅】",
-                shortName: "熱情紅",
-                task: "在繁華街頭尋找「紅色」的自動販賣機、燈籠、店面暖簾或大型招牌！",
-                colors: ["#FFEBEE", "#FFCDD2", "#EF9A9A", "#E57373", "#EF5350", "#F44336", "#E53935", "#D32F2F", "#C62828", "#B71C1C", "#880E4F", "#A30026", "#C9184A", "#FF4D6D", "#FF758F", "#FF8FAB", "#FFA6C9", "#FFCCD5"]
-            },
-            {
-                theme: "🌆 【新世界街 ✕ 通天落日橘】",
-                shortName: "落日橘",
-                task: "拍下帶著「夕陽橘色」元素的街景、黃昏天空、甚至是計程車車身！",
-                colors: ["#FFF3E0", "#FFE0B2", "#FFCC80", "#FFB74D", "#FFA726", "#FF9800", "#FB8C00", "#F57C00", "#E65100", "#F4A261", "#E76F51", "#D94E34", "#B23A22", "#FF7A00", "#FF6B00", "#E05300", "#B83500", "#8F2500"]
-            },
-            {
-                theme: "🚏 【黑門市場 ✕ 盛夏元氣黃】",
-                shortName: "元氣黃",
-                task: "在身邊尋找任何醒目的「黃色」物品，如警戒線、衣服或黃色路標挑戰擺拍！",
-                colors: ["#FFFDE7", "#FFF9C4", "#FFF59D", "#FFF176", "#FFEE58", "#FFEB3B", "#FDD835", "#FBC02D", "#F9A825", "#F57F17", "#FEFAE0", "#FFF3B0", "#FFD166", "#FFB703", "#FFAA00", "#E59500", "#FFEA00", "#FFD600"]
-            },
-            {
-                theme: "🌌 【梅田藍天 ✕ 迷幻星空紫】",
-                shortName: "星空紫",
-                task: "拍下一張充滿都市科技感的「紫色」霓虹燈光、夜景或大樓玻璃折射！",
-                colors: ["#F3E5F5", "#E1BEE7", "#CE93D8", "#BA68C8", "#AB47BC", "#9C27B0", "#8E24AA", "#7B1FA2", "#6A1B9A", "#4A148C", "#E0AAFF", "#C77DFF", "#9D4EDD", "#7B2CBF", "#5A189A", "#3C096C", "#240046", "#120024"]
-            },
-            {
-                theme: "🦌 【春日大社 ✕ 古樸神鹿褐】",
-                shortName: "神鹿褐",
-                task: "尋找古樸的「木造色、大地色、褐色」建築、木造鳥居或歷史感物件！",
-                colors: ["#EFEBE9", "#D7CCC8", "#BCAAA4", "#A1887F", "#8D6E63", "#795548", "#6D4C41", "#5D4037", "#4E342E", "#3E2723", "#EDE0D4", "#D6CCC2", "#F5EBE0", "#E3D5CA", "#D5BDAF", "#A98467", "#8B5E3C", "#6E473B"]
-            },
-            {
-                theme: "🎋 【嵐山嵯峨 ✕ 竹林幽翠綠】",
-                shortName: "幽翠綠",
-                task: "尋找大自然或都市裡深邃的「深綠色」陰影、森林樹叢或墨綠色元素！",
-                colors: ["#F1F8E9", "#DCEDC8", "#C5E1A5", "#AED581", "#9CCC65", "#8BC34A", "#7CB342", "#689F38", "#558B2F", "#33691E", "#ECEFDE", "#D0DB97", "#698252", "#4A5738", "#373F27", "#1E2514", "#131909", "#0B1005"]
-            },
-            {
-                theme: "🌊 【白鷺姬路 ✕ 冷冽灰藍石】",
-                shortName: "灰藍石",
-                task: "尋找帶著「高級灰藍色」的現代建築牆面、制服或工業風幾何線條！",
-                colors: ["#ECEFF1", "#CFD8DC", "#B0BEC5", "#90A4AE", "#78909C", "#607D8B", "#546E7A", "#455A64", "#37474F", "#263238", "#E6EED6", "#D4E09B", "#A3C9A8", "#84B59F", "#69A297", "#50808E", "#3A5F66", "#253D44"]
-            },
-            {
-                theme: "🍣 【紀州黑潮 ✕ 炙燒鮭魚脂】",
-                shortName: "鮭魚脂",
-                task: "尋找介於粉與橘之間的「珊瑚鮭魚色」，如生魚片、黃昏晚霞或美食包裝！",
-                colors: ["#FFE0B2", "#FBC4AB", "#FFB5A7", "#FFCAD4", "#F8AD9D", "#F4978E", "#F08080", "#FA8072", "#FFA07A", "#FF7F50", "#FF6347", "#FF4500", "#E03E16", "#C8320F", "#A02205", "#781400", "#FF8A65", "#FF7043"]
-            },
-            {
-                theme: "🦾 【未來特攻 ✕ 液態玻璃灰】",
-                shortName: "玻璃灰",
-                task: "尋找帶有「科技銀灰色、極簡灰白、透明玻璃」質感的反光材質或幾何造景！",
-                colors: ["#FAFAFA", "#F5F5F5", "#EEEEEE", "#E0E0E0", "#BDBDBD", "#9E9E9E", "#757575", "#616161", "#424242", "#212121", "#F8F9FA", "#E9ECEF", "#DEE2E6", "#CED4DA", "#ADB5BD", "#6C757D", "#495057", "#343A40"]
-            }
+            { theme: "🌸 【幾何櫻花 ✕ 微醺粉色系】", shortName: "幾何櫻花", task: "尋找街頭任何浪漫的「粉紅色」元素、櫻花意象、或是粉嫩的伴手禮包裝！", colors: ["#FFF0F5", "#FFE4E1", "#FFD1DC", "#FBC4AB", "#F8AD9D", "#F4978E", "#FFB3C1", "#FFA6C9", "#FF8FAB", "#FF758F", "#FF5C8A", "#FF477E", "#FF1493", "#FF007F", "#E60067", "#DE0052", "#C9184A", "#A30026"] },
+            { theme: "🍵 【宇治古剎 ✕ 瑩透抹茶綠】", shortName: "宇治古剎", task: "捕捉一處帶有「綠色」植物的日式屋簷、庭園、青苔或抹茶點心！", colors: ["#F4F9F4", "#E8F5E9", "#C8E6C9", "#D8F3DC", "#B7E4C7", "#A3E4D7", "#95D5B2", "#74C69D", "#52B788", "#40916C", "#2E7D32", "#1B5E20", "#1E4620", "#386641", "#6A994E", "#A7C957", "#38B000", "#007200"] },
+            { theme: "🎐 【鴨川微風 ✕ 縹緲川藍系】", shortName: "縹緲藍", task: "捕捉任何「清澈藍色」的物品，如天空、河川、地鐵車身或晴雨傘！", colors: ["#F0F8FF", "#E0F7FA", "#E0FBFC", "#C2F3F8", "#B3E5FC", "#98E1EC", "#81D4FA", "#4EA8DE", "#3A86C8", "#0077B6", "#023E8A", "#03045E", "#1A237E", "#0D47A1", "#1565C0", "#1976D2", "#0091EA", "#00B0FF"] },
+            { theme: "🏮 【道頓堀河 ✕ 霓虹熱情紅】", shortName: "熱情紅", task: "在繁華街頭尋找「紅色」的自動販賣機、燈籠、店面暖簾或大型招牌！", colors: ["#FFEBEE", "#FFCDD2", "#EF9A9A", "#E57373", "#EF5350", "#F44336", "#E53935", "#D32F2F", "#C62828", "#B71C1C", "#880E4F", "#A30026", "#C9184A", "#FF4D6D", "#FF758F", "#FF8FAB", "#FFA6C9", "#FFCCD5"] },
+            { theme: "🌆 【新世界街 ✕ 通天落日橘】", shortName: "落日橘", task: "拍下帶著「夕陽橘色」元素的街景、黃昏天空、甚至是計程車車身！", colors: ["#FFF3E0", "#FFE0B2", "#FFCC80", "#FFB74D", "#FFA726", "#FF9800", "#FB8C00", "#F57C00", "#E65100", "#F4A261", "#E76F51", "#D94E34", "#B23A22", "#FF7A00", "#FF6B00", "#E05300", "#B83500", "#8F2500"] },
+            { theme: "🚏 【黑門市場 ✕ 盛夏元氣黃】", shortName: "元氣黃", task: "在身邊尋找任何醒目的「黃色」物品，如警戒線、衣服或黃色路標挑戰擺拍！", colors: ["#FFFDE7", "#FFF9C4", "#FFF59D", "#FFF176", "#FFEE58", "#FFEB3B", "#FDD835", "#FBC02D", "#F9A825", "#F57F17", "#FEFAE0", "#FFF3B0", "#FFD166", "#FFB703", "#FFAA00", "#E59500", "#FFEA00", "#FFD600"] },
+            { theme: "🌌 【梅田藍天 ✕ 迷幻星空紫】", shortName: "星空紫", task: "拍下一張充滿都市科技感的「紫色」霓虹燈光、夜景或大樓玻璃折射！", colors: ["#F3E5F5", "#E1BEE7", "#CE93D8", "#BA68C8", "#AB47BC", "#9C27B0", "#8E24AA", "#7B1FA2", "#6A1B9A", "#4A148C", "#E0AAFF", "#C77DFF", "#9D4EDD", "#7B2CBF", "#5A189A", "#3C096C", "#240046", "#120024"] },
+            { theme: "🦌 【春日大社 ✕ 古樸神鹿褐】", shortName: "神鹿褐", task: "尋找古樸的「木造色、大地色、褐色」建築、木造鳥居或歷史感物件！", colors: ["#EFEBE9", "#D7CCC8", "#BCAAA4", "#A1887F", "#8D6E63", "#795548", "#6D4C41", "#5D4037", "#4E342E", "#3E2723", "#EDE0D4", "#D6CCC2", "#F5EBE0", "#E3D5CA", "#D5BDAF", "#A98467", "#8B5E3C", "#6E473B"] },
+            { theme: "🎋 【嵐山嵯峨 ✕ 竹林幽翠綠】", shortName: "幽翠綠", task: "尋找大自然或都市裡深邃的「深綠色」陰影、森林樹叢或墨綠色元素！", colors: ["#F1F8E9", "#DCEDC8", "#C5E1A5", "#AED581", "#9CCC65", "#8BC34A", "#7CB342", "#689F38", "#558B2F", "#33691E", "#ECEFDE", "#D0DB97", "#698252", "#4A5738", "#373F27", "#1E2514", "#131909", "#0B1005"] },
+            { theme: "🌊 【白鷺姬路 ✕ 冷冽灰藍石】", shortName: "灰藍石", task: "尋找帶著「高級灰藍色」的現代建築牆面、制服或工業風幾何線條！", colors: ["#ECEFF1", "#CFD8DC", "#B0BEC5", "#90A4AE", "#78909C", "#607D8B", "#546E7A", "#455A64", "#37474F", "#263238", "#E6EED6", "#D4E09B", "#A3C9A8", "#84B59F", "#69A297", "#50808E", "#3A5F66", "#253D44"] },
+            { theme: "🍣 【紀州黑潮 ✕ 炙燒鮭魚脂】", shortName: "鮭魚脂", task: "尋找介於粉與橘之間的「珊瑚鮭魚色」，如生魚片、黃昏晚霞或美食包裝！", colors: ["#FFE0B2", "#FBC4AB", "#FFB5A7", "#FFCAD4", "#F8AD9D", "#F4978E", "#F08080", "#FA8072", "#FFA07A", "#FF7F50", "#FF6347", "#FF4500", "#E03E16", "#C8320F", "#A02205", "#781400", "#FF8A65", "#FF7043"] },
+            { theme: "🦾 【未來特攻 ✕ 液態玻璃灰】", shortName: "玻璃灰", task: "尋找帶有「科技銀灰色、極簡灰白、透明玻璃」質感的反光材質或幾何造景！", colors: ["#FAFAFA", "#F5F5F5", "#EEEEEE", "#E0E0E0", "#BDBDBD", "#9E9E9E", "#757575", "#616161", "#424242", "#212121", "#F8F9FA", "#E9ECEF", "#DEE2E6", "#CED4DA", "#ADB5BD", "#6C757D", "#495057", "#343A40"] }
         ];
 
-        // 扁平化矩陣引擎：完美生成 216 色具有漸層分級的單元
         const colorDatabase = [];
         rawThemes.forEach(item => {
             item.colors.forEach((hex, index) => {
-                // 根據 1~18 的索引順序，動態推算精確色調標籤
-                let toneClassification = "";
-                if (index < 6) {
-                    toneClassification = "寡淡淺色";
-                } else if (index < 12) {
-                    toneClassification = "中性亮色";
-                } else {
-                    toneClassification = "飽和深色";
-                }
-
-                // 補零轉換為 01 ~ 18
-                const paddedIndex = String(index + 1).padStart(2, '0');
-
+                let tone = index < 6 ? "寡淡淺色" : index < 12 ? "中性亮色" : "飽和深色";
                 colorDatabase.push({
                     themeName: item.theme,
                     shortName: item.shortName,
                     task: item.task,
                     color: hex,
-                    tagLabel: `[ ${item.shortName} ${paddedIndex} / ${toneClassification} ]`
+                    tagLabel: `[ ${item.shortName} ${String(index + 1).padStart(2, '0')} / ${tone} ]`
                 });
             });
         });
 
-        // --- DOM 元件節點獲取 ---
         const scanBtn = document.getElementById('scan-btn');
         const rescanBtn = document.getElementById('rescan-btn');
         const initialState = document.getElementById('initial-state');
         const rollingState = document.getElementById('rolling-state');
         const resultState = document.getElementById('result-state');
 
-        const rollingCircle = document.getElementById('rolling-circle');
-        const rollingTheme = document.getElementById('rolling-theme');
-        const rollingHex = document.getElementById('rolling-hex');
-
-        const resultCircle = document.getElementById('result-circle');
-        const resultTag = document.getElementById('result-tag');
-        const resultTheme = document.getElementById('result-theme');
-        const resultTask = document.getElementById('result-task');
-        const resultHex = document.getElementById('result-hex');
-
-        // --- 互動與隨機抽選邏輯 ---
         scanBtn.addEventListener('click', () => {
+            // 若 PWA 提示還開著，點擊按鈕時順便把它收起來
+            if(androidPrompt.classList.contains('show')) androidPrompt.classList.remove('show');
+            if(iosPrompt.classList.contains('show')) iosPrompt.classList.remove('show');
+
             initialState.classList.add('hidden');
             rollingState.classList.remove('hidden');
 
-            let duration = 2000; // 流暢狂飆跑碼 2 秒
-            let intervalTime = 60; // 每 60ms 極速無縫洗牌
             let elapsed = 0;
-
             const timer = setInterval(() => {
-                // 從 216 個色碼中任意進行隨機動態檢索
-                const randomPick = colorDatabase[Math.floor(Math.random() * colorDatabase.length)];
-                
-                rollingCircle.style.backgroundColor = randomPick.color;
-                rollingCircle.style.boxShadow = `0 0 25px ${randomPick.color}aa`;
-                rollingTheme.textContent = randomPick.shortName + ' 矩陣分析中...';
-                rollingHex.textContent = randomPick.color;
+                const rand = colorDatabase[Math.floor(Math.random() * colorDatabase.length)];
+                document.getElementById('rolling-circle').style.backgroundColor = rand.color;
+                document.getElementById('rolling-circle').style.boxShadow = `0 0 25px ${rand.color}aa`;
+                document.getElementById('rolling-theme').textContent = rand.shortName + ' 分析中...';
+                document.getElementById('rolling-hex').textContent = rand.color;
 
-                elapsed += intervalTime;
-                if (elapsed >= duration) {
+                elapsed += 60;
+                if (elapsed >= 2000) {
                     clearInterval(timer);
                     renderFinalSelection();
                 }
-            }, intervalTime);
+            }, 60);
         });
 
         function renderFinalSelection() {
-            // 隨機取出最後決定的顏色資料單元
-            const finalPick = colorDatabase[Math.floor(Math.random() * colorDatabase.length)];
-
+            const final = colorDatabase[Math.floor(Math.random() * colorDatabase.length)];
             rollingState.classList.add('hidden');
             resultState.classList.remove('hidden');
 
-            // 即時渲染最終圓形色塊與柔和霓虹外光暈效果
-            resultCircle.style.backgroundColor = finalPick.color;
-            resultCircle.style.boxShadow = `0 15px 45px ${finalPick.color}99, 0 0 20px ${finalPick.color}44`;
+            const rCircle = document.getElementById('result-circle');
+            rCircle.style.backgroundColor = final.color;
+            rCircle.style.boxShadow = `0 15px 45px ${final.color}99, 0 0 20px ${final.color}44`;
             
-            // 精確動態綁定核心文字數據
-            resultTag.textContent = finalPick.tagLabel;
-            resultTheme.textContent = finalPick.themeName;
-            resultTask.textContent = finalPick.task;
+            document.getElementById('result-tag').textContent = final.tagLabel;
+            document.getElementById('result-theme').textContent = final.themeName;
+            document.getElementById('result-task').textContent = final.task;
             
-            // 色碼標籤渲染
-            resultHex.textContent = finalPick.color;
-            resultHex.style.backgroundColor = finalPick.color;
-            resultHex.style.color = getContrastColor(finalPick.color); // 智慧防瞎計算
+            const rHex = document.getElementById('result-hex');
+            rHex.textContent = final.color;
+            rHex.style.backgroundColor = final.color;
+            rHex.style.color = getContrastColor(final.color);
         }
 
-        // 重新抽選按鈕
         rescanBtn.addEventListener('click', () => {
             resultState.classList.add('hidden');
             initialState.classList.remove('hidden');
         });
 
-        // 智慧型對比色計算 (YIQ 演算法，確保深色/淺色字體皆完美清晰)
         function getContrastColor(hex) {
             const r = parseInt(hex.slice(1, 3), 16);
             const g = parseInt(hex.slice(3, 5), 16);
             const b = parseInt(hex.slice(5, 7), 16);
-            const yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
-            return (yiq >= 145) ? '#1f2029' : '#ffffff';
-        }
-
-        // --- 高級防斷網：雙向離線資產快取 (Service Worker) ---
-        if ('caches' in window) {
-            caches.open('travel-color-v2').then(cache => {
-                cache.add(window.location.href)
-                    .catch(err => console.log('[Cache] 主執行緒預載提示: ', err));
-            });
-        }
-
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                const swScript = `
-                    const CACHE_NAME = 'travel-color-v2';
-                    self.addEventListener('install', e => self.skipWaiting());
-                    self.addEventListener('activate', e => e.waitUntil(self.clients.claim()));
-                    self.addEventListener('fetch', e => {
-                        e.respondWith(
-                            caches.match(e.request).then(res => res || fetch(e.request))
-                        );
-                    });
-                `;
-                try {
-                    const blob = new Blob([swScript], { type: 'text/javascript' });
-                    navigator.serviceWorker.register(URL.createObjectURL(blob));
-                } catch (e) {}
-            });
+            return (((r * 299) + (g * 587) + (b * 114)) / 1000 >= 145) ? '#1f2029' : '#ffffff';
         }
     </script>
 </body>
